@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PlantPal — Your Garden Companion</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sage: #7a9e7e;
+    --deep-green: #2d4a35;
+    --moss: #4a6741;
+    --cream: #f5f0e8;
+    --warm-white: #faf8f4;
+    --earth: #8b6f47;
+    --light-sage: #c8ddc9;
+    --pale: #e8f0e9;
+    --text: #1a2e1c;
+    --muted: #6b7c6d;
+    --accent: #d4a853;
+    --danger: #c0605a;
+    --card-bg: #ffffff;
+    --border: #d8e5d9;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--warm-white);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== NAV ===== */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(250,248,244,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2.5rem; height: 64px;
+  }
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem; font-weight: 700; color: var(--deep-green);
+    cursor: pointer;
+  }
+  .nav-logo span { font-size: 1.5rem; }
+  .nav-links { display: flex; gap: 0.5rem; }
+  .nav-links button {
+    background: none; border: none; padding: 8px 16px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+    color: var(--muted); cursor: pointer; border-radius: 8px;
+    transition: all 0.2s;
+  }
+  .nav-links button:hover, .nav-links button.active {
+    background: var(--pale); color: var(--deep-green); font-weight: 500;
+  }
+  .nav-cta {
+    background: var(--deep-green) !important; color: white !important;
+    font-weight: 500 !important;
+  }
+  .nav-cta:hover { background: var(--moss) !important; }
+
+  /* ===== PAGES ===== */
+  .page { display: none; padding-top: 64px; min-height: 100vh; }
+  .page.active { display: block; }
+
+  /* ===== HOME ===== */
+  #home {
+    background: linear-gradient(160deg, var(--warm-white) 0%, var(--pale) 60%, var(--light-sage) 100%);
+  }
+  .hero {
+    display: grid; grid-template-columns: 1fr 1fr;
+    min-height: calc(100vh - 64px); align-items: center;
+    padding: 4rem 6rem; gap: 4rem; max-width: 1300px; margin: 0 auto;
+  }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--pale); border: 1px solid var(--border);
+    padding: 6px 14px; border-radius: 100px;
+    font-size: 0.8rem; color: var(--moss); font-weight: 500; margin-bottom: 1.5rem;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.8rem, 4.5vw, 4.2rem);
+    line-height: 1.15; color: var(--deep-green); margin-bottom: 1.2rem;
+  }
+  .hero h1 em { font-style: italic; color: var(--sage); }
+  .hero p { font-size: 1.05rem; color: var(--muted); line-height: 1.7; max-width: 480px; margin-bottom: 2rem; }
+  .hero-actions { display: flex; gap: 1rem; align-items: center; }
+  .btn-primary {
+    background: var(--deep-green); color: white;
+    border: none; padding: 14px 28px; border-radius: 12px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 500;
+    cursor: pointer; transition: all 0.25s; display: flex; align-items: center; gap: 8px;
+  }
+  .btn-primary:hover { background: var(--moss); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(45,74,53,0.25); }
+  .btn-secondary {
+    background: none; color: var(--deep-green);
+    border: 1.5px solid var(--border); padding: 13px 24px; border-radius: 12px;
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem; font-weight: 500;
+    cursor: pointer; transition: all 0.25s;
+  }
+  .btn-secondary:hover { border-color: var(--sage); background: var(--pale); }
+
+  .hero-visual {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+    animation: floatIn 0.8s ease both;
+  }
+  @keyframes floatIn {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .plant-card-mini {
+    background: white; border-radius: 18px; padding: 1.4rem;
+    border: 1px solid var(--border); box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    transition: transform 0.3s;
+  }
+  .plant-card-mini:hover { transform: translateY(-4px); }
+  .plant-card-mini:nth-child(2) { margin-top: 1.5rem; }
+  .plant-card-mini:nth-child(3) { margin-top: -1rem; }
+  .plant-emoji { font-size: 2.2rem; margin-bottom: 0.7rem; display: block; }
+  .plant-card-mini h4 { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 0.3rem; }
+  .plant-card-mini p { font-size: 0.78rem; color: var(--muted); }
+  .mini-status {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 0.72rem; font-weight: 500; padding: 3px 9px;
+    border-radius: 100px; margin-top: 0.7rem;
+  }
+  .status-water { background: #e0f0ff; color: #2980b9; }
+  .status-good { background: #e6f5e6; color: var(--moss); }
+  .status-sun { background: #fff8e0; color: #c8900a; }
+
+  .features-strip {
+    display: flex; justify-content: center; gap: 2.5rem;
+    padding: 2.5rem; border-top: 1px solid var(--border);
+    flex-wrap: wrap;
+  }
+  .feat-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--muted); }
+  .feat-item span { font-size: 1.2rem; }
+
+  /* ===== DASHBOARD ===== */
+  #dashboard { background: var(--warm-white); }
+  .dash-layout { display: grid; grid-template-columns: 260px 1fr; min-height: calc(100vh - 64px); }
+
+  .sidebar {
+    background: white; border-right: 1px solid var(--border);
+    padding: 1.5rem; display: flex; flex-direction: column; gap: 0.4rem;
+  }
+  .sidebar-title { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--muted); padding: 8px 12px; margin-top: 0.5rem; }
+  .sidebar-btn {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: 10px; border: none;
+    background: none; font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+    color: var(--muted); cursor: pointer; transition: all 0.2s; text-align: left;
+  }
+  .sidebar-btn:hover { background: var(--pale); color: var(--text); }
+  .sidebar-btn.active { background: var(--pale); color: var(--deep-green); font-weight: 600; }
+  .sidebar-btn .icon { font-size: 1.1rem; width: 24px; }
+
+  .dash-main { padding: 2rem 2.5rem; overflow-y: auto; }
+  .dash-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+  .dash-header h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--deep-green); }
+  .dash-header p { color: var(--muted); font-size: 0.9rem; margin-top: 2px; }
+
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; margin-bottom: 2rem; }
+  .stat-card {
+    background: white; border-radius: 16px; padding: 1.4rem;
+    border: 1px solid var(--border); display: flex; align-items: center; gap: 1rem;
+    transition: box-shadow 0.2s;
+  }
+  .stat-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+  .stat-icon { font-size: 1.8rem; width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+  .stat-icon.green { background: var(--pale); }
+  .stat-icon.blue { background: #e0f0ff; }
+  .stat-icon.amber { background: #fff8e0; }
+  .stat-info h3 { font-size: 1.6rem; font-weight: 700; color: var(--text); }
+  .stat-info p { font-size: 0.8rem; color: var(--muted); margin-top: 1px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+  .section-card { background: white; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
+  .section-header { padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .section-header h3 { font-size: 0.95rem; font-weight: 600; color: var(--text); }
+  .section-body { padding: 1rem 1.5rem; }
+
+  .reminder-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 0.8rem 0; border-bottom: 1px solid var(--border);
+  }
+  .reminder-item:last-child { border-bottom: none; }
+  .reminder-dot { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+  .dot-water { background: #e0f0ff; }
+  .dot-sun { background: #fff8e0; }
+  .dot-urgent { background: #fde8e7; }
+  .reminder-text h4 { font-size: 0.88rem; font-weight: 500; color: var(--text); }
+  .reminder-text p { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+  .reminder-when { margin-left: auto; font-size: 0.75rem; color: var(--muted); white-space: nowrap; }
+
+  .plant-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1.2rem; margin-bottom: 2rem; }
+  .plant-card {
+    background: white; border-radius: 16px; border: 1px solid var(--border);
+    overflow: hidden; transition: all 0.25s; cursor: pointer;
+  }
+  .plant-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.1); transform: translateY(-3px); }
+  .plant-card-top {
+    height: 120px; display: flex; align-items: center; justify-content: center;
+    font-size: 3rem; position: relative;
+  }
+  .plant-health-badge {
+    position: absolute; top: 10px; right: 10px;
+    font-size: 0.68rem; font-weight: 600; padding: 3px 8px; border-radius: 100px;
+  }
+  .health-excellent { background: #e6f5e6; color: var(--moss); }
+  .health-good { background: #e0f0ff; color: #2980b9; }
+  .health-needs { background: #fde8e7; color: var(--danger); }
+  .plant-card-body { padding: 1rem 1.2rem; }
+  .plant-card-body h4 { font-size: 0.95rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .plant-card-body p { font-size: 0.78rem; color: var(--muted); }
+  .plant-card-footer {
+    padding: 0.8rem 1.2rem; border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .plant-water-info { font-size: 0.75rem; color: var(--muted); display: flex; align-items: center; gap: 5px; }
+
+  .add-plant-btn {
+    background: var(--deep-green); color: white; border: none;
+    padding: 10px 20px; border-radius: 10px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px;
+    transition: all 0.2s;
+  }
+  .add-plant-btn:hover { background: var(--moss); transform: translateY(-1px); }
+
+  /* ===== PROGRESS BAR ===== */
+  .progress-bar { background: var(--pale); border-radius: 100px; height: 6px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 100px; background: var(--sage); }
+
+  /* ===== ADD PLANT FORM ===== */
+  #add-plant { background: var(--warm-white); }
+  .form-container { max-width: 680px; margin: 3rem auto; padding: 0 2rem; }
+  .form-card { background: white; border-radius: 20px; border: 1px solid var(--border); padding: 2.5rem; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+  .form-title { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--deep-green); margin-bottom: 0.4rem; }
+  .form-subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 2rem; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+  .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-group label { font-size: 0.85rem; font-weight: 500; color: var(--text); }
+  .form-group input, .form-group select, .form-group textarea {
+    padding: 11px 14px; border-radius: 10px; border: 1.5px solid var(--border);
+    font-family: 'DM Sans', sans-serif; font-size: 0.9rem; color: var(--text);
+    background: var(--warm-white); transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: var(--sage); box-shadow: 0 0 0 3px rgba(122,158,126,0.15);
+  }
+  .form-group textarea { resize: vertical; min-height: 90px; }
+  .emoji-picker { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 0.3rem; }
+  .emoji-opt {
+    font-size: 1.6rem; width: 50px; height: 50px; border-radius: 12px;
+    border: 2px solid var(--border); background: white; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+  }
+  .emoji-opt:hover { border-color: var(--sage); transform: scale(1.08); }
+  .emoji-opt.selected { border-color: var(--deep-green); background: var(--pale); }
+
+  .form-actions { display: flex; gap: 1rem; margin-top: 1.5rem; }
+  .btn-submit {
+    flex: 1; background: var(--deep-green); color: white; border: none;
+    padding: 14px; border-radius: 12px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem; font-weight: 500; cursor: pointer; transition: all 0.25s;
+  }
+  .btn-submit:hover { background: var(--moss); }
+  .btn-cancel {
+    padding: 14px 24px; border-radius: 12px; border: 1.5px solid var(--border);
+    background: none; font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+    cursor: pointer; color: var(--muted); transition: all 0.2s;
+  }
+  .btn-cancel:hover { border-color: var(--muted); color: var(--text); }
+
+  /* ===== PLANT INFO ===== */
+  #plant-info { background: var(--warm-white); }
+  .info-container { max-width: 1100px; margin: 0 auto; padding: 3rem 2rem; }
+  .info-header { margin-bottom: 2.5rem; }
+  .info-header h2 { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--deep-green); margin-bottom: 0.5rem; }
+  .search-bar {
+    display: flex; gap: 1rem; margin-bottom: 2rem;
+  }
+  .search-input {
+    flex: 1; padding: 12px 16px; border-radius: 12px; border: 1.5px solid var(--border);
+    font-family: 'DM Sans', sans-serif; font-size: 0.95rem; background: white;
+    outline: none; transition: all 0.2s; color: var(--text);
+  }
+  .search-input:focus { border-color: var(--sage); box-shadow: 0 0 0 3px rgba(122,158,126,0.15); }
+  .info-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+  .info-card {
+    background: white; border-radius: 18px; border: 1px solid var(--border);
+    overflow: hidden; transition: all 0.25s;
+  }
+  .info-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.1); transform: translateY(-3px); }
+  .info-card-top { height: 100px; display: flex; align-items: center; justify-content: center; font-size: 3.5rem; }
+  .info-card-body { padding: 1.2rem 1.4rem; }
+  .info-card-body h3 { font-size: 1.05rem; font-weight: 600; color: var(--text); margin-bottom: 0.8rem; }
+  .info-tag { display: inline-flex; align-items: center; gap: 5px; font-size: 0.75rem; font-weight: 500; padding: 4px 10px; border-radius: 100px; margin: 2px; }
+  .tag-water { background: #e0f0ff; color: #2980b9; }
+  .tag-sun { background: #fff8e0; color: #c8900a; }
+  .tag-diff { background: var(--pale); color: var(--moss); }
+  .tag-hard { background: #fde8e7; color: var(--danger); }
+  .info-card-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.6; margin-top: 0.8rem; }
+
+  /* ===== GROWTH TRACKER ===== */
+  #tracker { background: var(--warm-white); }
+  .tracker-container { max-width: 900px; margin: 0 auto; padding: 3rem 2rem; }
+  .tracker-header { margin-bottom: 2rem; }
+  .tracker-header h2 { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--deep-green); margin-bottom: 0.4rem; }
+  .tracker-grid { display: grid; gap: 1.2rem; }
+  .tracker-card {
+    background: white; border-radius: 16px; border: 1px solid var(--border);
+    padding: 1.4rem 1.6rem; display: grid; grid-template-columns: auto 1fr auto;
+    align-items: center; gap: 1.5rem; cursor: pointer; transition: all 0.2s;
+  }
+  .tracker-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); transform: translateX(4px); }
+  .tracker-emoji { font-size: 2.5rem; }
+  .tracker-info h4 { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .tracker-info p { font-size: 0.82rem; color: var(--muted); margin-bottom: 10px; }
+  .tracker-meta { display: flex; gap: 1rem; }
+  .tracker-stat { font-size: 0.8rem; color: var(--muted); }
+  .tracker-stat strong { color: var(--text); }
+  .tracker-btn {
+    background: var(--pale); color: var(--deep-green); border: none;
+    padding: 8px 16px; border-radius: 8px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.82rem; font-weight: 500; cursor: pointer; transition: all 0.2s;
+  }
+  .tracker-btn:hover { background: var(--light-sage); }
+
+  .log-entry {
+    display: flex; gap: 1rem; padding: 1rem; background: var(--warm-white);
+    border-radius: 10px; margin-top: 0.8rem;
+  }
+  .log-date { font-size: 0.75rem; color: var(--muted); white-space: nowrap; padding-top: 2px; }
+  .log-content { flex: 1; }
+  .log-content h5 { font-size: 0.85rem; font-weight: 500; color: var(--text); }
+  .log-content p { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+
+  /* ===== AUTH ===== */
+  #login, #register { background: linear-gradient(160deg, var(--warm-white), var(--pale)); display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+  .auth-card { background: white; border-radius: 24px; border: 1px solid var(--border); padding: 3rem; width: 420px; box-shadow: 0 8px 40px rgba(0,0,0,0.08); }
+  .auth-logo { text-align: center; font-size: 2.5rem; margin-bottom: 0.5rem; }
+  .auth-title { font-family: 'Playfair Display', serif; font-size: 1.7rem; color: var(--deep-green); text-align: center; margin-bottom: 0.3rem; }
+  .auth-sub { text-align: center; color: var(--muted); font-size: 0.88rem; margin-bottom: 2rem; }
+  .auth-form { display: flex; flex-direction: column; gap: 1rem; }
+  .auth-form input {
+    padding: 12px 15px; border-radius: 10px; border: 1.5px solid var(--border);
+    font-family: 'DM Sans', sans-serif; font-size: 0.92rem; color: var(--text);
+    background: var(--warm-white); outline: none; transition: all 0.2s;
+  }
+  .auth-form input:focus { border-color: var(--sage); box-shadow: 0 0 0 3px rgba(122,158,126,0.15); }
+  .btn-auth {
+    background: var(--deep-green); color: white; border: none;
+    padding: 13px; border-radius: 12px; font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem; font-weight: 500; cursor: pointer; margin-top: 0.5rem; transition: all 0.2s;
+  }
+  .btn-auth:hover { background: var(--moss); }
+  .auth-switch { text-align: center; font-size: 0.85rem; color: var(--muted); margin-top: 1.2rem; }
+  .auth-switch a { color: var(--sage); font-weight: 500; cursor: pointer; text-decoration: none; }
+  .auth-switch a:hover { color: var(--deep-green); }
+  .divider { display: flex; align-items: center; gap: 1rem; margin: 0.5rem 0; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .divider span { font-size: 0.78rem; color: var(--muted); }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; z-index: 200;
+    background: rgba(0,0,0,0.4); backdrop-filter: blur(4px);
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: white; border-radius: 20px; padding: 2rem; width: 420px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: popIn 0.25s ease;
+  }
+  @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+  .modal h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--deep-green); margin-bottom: 0.5rem; }
+  .modal p { color: var(--muted); font-size: 0.88rem; margin-bottom: 1.5rem; }
+  .modal .form-group { margin-bottom: 1rem; }
+  .modal-actions { display: flex; gap: 0.8rem; margin-top: 1.2rem; }
+  .modal-actions .btn-primary { flex: 1; }
+  .btn-outline {
+    padding: 11px 18px; border-radius: 10px; border: 1.5px solid var(--border);
+    background: none; font-family: 'DM Sans', sans-serif; font-size: 0.9rem;
+    cursor: pointer; color: var(--muted);
+  }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed; bottom: 2rem; right: 2rem; z-index: 999;
+    background: var(--deep-green); color: white; padding: 14px 20px;
+    border-radius: 12px; font-size: 0.9rem; font-weight: 500;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.2); transform: translateY(100px);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-width: 320px;
+  }
+  .toast.show { transform: translateY(0); }
+
+  /* ===== TAGS ROW ===== */
+  .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+
+  /* ===== WEATHER WIDGET ===== */
+  .weather-widget {
+    background: linear-gradient(135deg, #e8f5e9, #c8ddc9);
+    border-radius: 14px; padding: 1.2rem 1.5rem;
+    border: 1px solid var(--border); margin-bottom: 1.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .weather-left { display: flex; align-items: center; gap: 14px; }
+  .weather-icon { font-size: 2.2rem; }
+  .weather-text h4 { font-size: 0.9rem; font-weight: 600; color: var(--deep-green); }
+  .weather-text p { font-size: 0.8rem; color: var(--moss); }
+  .weather-temp { font-size: 1.8rem; font-weight: 700; color: var(--deep-green); }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; padding: 3rem 2rem; }
+    .hero-visual { display: none; }
+    .dash-layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVIGATION -->
+<nav>
+  <div class="nav-logo" onclick="showPage('home')"><span>🌱</span> PlantPal</div>
+  <div class="nav-links">
+    <button onclick="showPage('home')" id="nav-home" class="active">Home</button>
+    <button onclick="showPage('dashboard')" id="nav-dashboard">Dashboard</button>
+    <button onclick="showPage('plant-info')" id="nav-plant-info">Plant Guide</button>
+    <button onclick="showPage('tracker')" id="nav-tracker">Growth Tracker</button>
+    <button onclick="showPage('add-plant')" id="nav-add-plant">Add Plant</button>
+  </div>
+  <button class="nav-links"><button class="nav-cta btn-primary" onclick="showPage('login')" style="padding:8px 18px;font-size:0.88rem;">Sign In</button></button>
+</nav>
+
+<!-- HOME PAGE -->
+<div id="home" class="page active">
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-badge"><span>🌿</span> Your garden companion</div>
+      <h1>Grow your <em>garden</em> with confidence</h1>
+      <p>PlantPal helps you track your plants, get smart watering reminders, and discover care tips tailored to every plant in your garden.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="showPage('register')">🌱 Get Started Free</button>
+        <button class="btn-secondary" onclick="showPage('plant-info')">Browse Plants →</button>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="plant-card-mini"><span class="plant-emoji">🌵</span><h4>Cactus</h4><p>Desert Succulent</p><span class="mini-status status-good">✓ Healthy</span></div>
+      <div class="plant-card-mini"><span class="plant-emoji">🌿</span><h4>Pothos</h4><p>Tropical Vine</p><span class="mini-status status-water">💧 Water today</span></div>
+      <div class="plant-card-mini"><span class="plant-emoji">🌸</span><h4>Orchid</h4><p>Exotic Flower</p><span class="mini-status status-sun">☀ Needs sun</span></div>
+      <div class="plant-card-mini"><span class="plant-emoji">🌱</span><h4>Aloe Vera</h4><p>Medicinal Plant</p><span class="mini-status status-good">✓ Healthy</span></div>
+    </div>
+  </div>
+  <div class="features-strip">
+    <div class="feat-item"><span>💧</span> Smart watering reminders</div>
+    <div class="feat-item"><span>📊</span> Growth tracking</div>
+    <div class="feat-item"><span>📚</span> Plant care library</div>
+    <div class="feat-item"><span>🌦</span> Weather-based tips</div>
+    <div class="feat-item"><span>📱</span> Mobile friendly</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="page">
+  <div class="dash-layout">
+    <aside class="sidebar">
+      <div class="sidebar-title">Menu</div>
+      <button class="sidebar-btn active"><span class="icon">🏠</span> Dashboard</button>
+      <button class="sidebar-btn" onclick="showPage('add-plant')"><span class="icon">➕</span> Add Plant</button>
+      <button class="sidebar-btn" onclick="showPage('plant-info')"><span class="icon">📚</span> Plant Guide</button>
+      <button class="sidebar-btn" onclick="showPage('tracker')"><span class="icon">📊</span> Growth Tracker</button>
+      <div class="sidebar-title">Account</div>
+      <button class="sidebar-btn"><span class="icon">⚙️</span> Settings</button>
+      <button class="sidebar-btn" onclick="showPage('login')"><span class="icon">🚪</span> Logout</button>
+    </aside>
+    <main class="dash-main">
+      <div class="dash-header">
+        <div><h2>Good morning, Gardener 🌻</h2><p>Friday, March 13 · 3 plants need attention today</p></div>
+        <button class="add-plant-btn" onclick="showPage('add-plant')">➕ Add Plant</button>
+      </div>
+
+      <!-- Weather -->
+      <div class="weather-widget">
+        <div class="weather-left">
+          <div class="weather-icon">⛅</div>
+          <div class="weather-text">
+            <h4>Partly Cloudy — Mathura, UP</h4>
+            <p>Good conditions for outdoor plants · Light breeze expected</p>
+          </div>
+        </div>
+        <div class="weather-temp">28°C</div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon green">🌱</div>
+          <div class="stat-info"><h3>8</h3><p>Total Plants</p></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue">💧</div>
+          <div class="stat-info"><h3>3</h3><p>Need Watering</p></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon amber">🌟</div>
+          <div class="stat-info"><h3>5</h3><p>Healthy Plants</p></div>
+        </div>
+      </div>
+
+      <!-- Reminders + Plants -->
+      <div class="grid-2">
+        <div class="section-card">
+          <div class="section-header"><h3>⏰ Today's Reminders</h3></div>
+          <div class="section-body">
+            <div class="reminder-item">
+              <div class="reminder-dot dot-water">💧</div>
+              <div class="reminder-text"><h4>Water Pothos</h4><p>Last watered 3 days ago</p></div>
+              <span class="reminder-when">Overdue</span>
+            </div>
+            <div class="reminder-item">
+              <div class="reminder-dot dot-urgent">🚨</div>
+              <div class="reminder-text"><h4>Water Monstera</h4><p>Last watered 5 days ago</p></div>
+              <span class="reminder-when">Urgent</span>
+            </div>
+            <div class="reminder-item">
+              <div class="reminder-dot dot-sun">☀️</div>
+              <div class="reminder-text"><h4>Move Orchid to sunlight</h4><p>Needs 4+ hours of indirect light</p></div>
+              <span class="reminder-when">Today</span>
+            </div>
+            <div class="reminder-item">
+              <div class="reminder-dot dot-water">💧</div>
+              <div class="reminder-text"><h4>Water Cactus</h4><p>Scheduled for today</p></div>
+              <span class="reminder-when">Today</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-header"><h3>📈 Growth Overview</h3></div>
+          <div class="section-body">
+            <div style="display:flex;flex-direction:column;gap:1rem;padding:0.5rem 0;">
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:6px;"><span>🌿 Pothos</span><span style="color:var(--muted)">32 cm</span></div>
+                <div class="progress-bar"><div class="progress-fill" style="width:65%"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:6px;"><span>🌵 Cactus</span><span style="color:var(--muted)">18 cm</span></div>
+                <div class="progress-bar"><div class="progress-fill" style="width:36%;background:var(--earth)"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:6px;"><span>🌱 Aloe Vera</span><span style="color:var(--muted)">25 cm</span></div>
+                <div class="progress-bar"><div class="progress-fill" style="width:50%"></div></div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:6px;"><span>🍀 Snake Plant</span><span style="color:var(--muted)">45 cm</span></div>
+                <div class="progress-bar"><div class="progress-fill" style="width:90%;background:var(--deep-green)"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Plant Grid -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+        <h3 style="font-size:1rem;font-weight:600;color:var(--text);">My Plants</h3>
+        <button class="add-plant-btn" onclick="showPage('add-plant')" style="font-size:0.8rem;padding:8px 14px;">+ Add</button>
+      </div>
+      <div class="plant-grid" id="plant-grid">
+        <!-- Populated by JS -->
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ADD PLANT PAGE -->
+<div id="add-plant" class="page">
+  <div class="form-container">
+    <div class="form-card">
+      <h2 class="form-title">Add a New Plant 🌱</h2>
+      <p class="form-subtitle">Fill in the details to start tracking your plant</p>
+      <div>
+        <div class="form-group full" style="margin-bottom:1.5rem;">
+          <label>Choose an icon for your plant</label>
+          <div class="emoji-picker" id="emoji-picker">
+            <div class="emoji-opt selected" data-emoji="🌱">🌱</div>
+            <div class="emoji-opt" data-emoji="🌿">🌿</div>
+            <div class="emoji-opt" data-emoji="🌵">🌵</div>
+            <div class="emoji-opt" data-emoji="🌸">🌸</div>
+            <div class="emoji-opt" data-emoji="🌺">🌺</div>
+            <div class="emoji-opt" data-emoji="🌻">🌻</div>
+            <div class="emoji-opt" data-emoji="🍀">🍀</div>
+            <div class="emoji-opt" data-emoji="🌹">🌹</div>
+            <div class="emoji-opt" data-emoji="🎋">🎋</div>
+            <div class="emoji-opt" data-emoji="🎍">🎍</div>
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Plant Name *</label>
+            <input type="text" id="plant-name" placeholder="e.g., My Pothos" required>
+          </div>
+          <div class="form-group">
+            <label>Plant Type *</label>
+            <select id="plant-type">
+              <option value="">Select type</option>
+              <option>Succulent</option>
+              <option>Tropical</option>
+              <option>Flowering</option>
+              <option>Herb</option>
+              <option>Cactus</option>
+              <option>Fern</option>
+              <option>Tree / Shrub</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Watering Frequency</label>
+            <select id="water-freq">
+              <option>Every 2 days</option>
+              <option>Every 3 days</option>
+              <option selected>Every week</option>
+              <option>Every 10 days</option>
+              <option>Every 2 weeks</option>
+              <option>Monthly</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Sunlight Requirement</label>
+            <select id="sunlight">
+              <option>Full sun (6+ hrs)</option>
+              <option selected>Indirect light</option>
+              <option>Partial shade</option>
+              <option>Low light</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Location</label>
+            <input type="text" id="location" placeholder="e.g., Bedroom windowsill">
+          </div>
+          <div class="form-group">
+            <label>Date Added</label>
+            <input type="date" id="date-added">
+          </div>
+          <div class="form-group full">
+            <label>Notes</label>
+            <textarea id="notes" placeholder="Any special care instructions or observations..."></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn-cancel" onclick="showPage('dashboard')">Cancel</button>
+          <button class="btn-submit" onclick="addPlant()">🌱 Add Plant</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PLANT INFO -->
+<div id="plant-info" class="page">
+  <div class="info-container">
+    <div class="info-header">
+      <h2>Plant Care Guide 📚</h2>
+      <p style="color:var(--muted);font-size:0.9rem;">Learn how to care for popular plants</p>
+    </div>
+    <div class="search-bar">
+      <input type="text" class="search-input" placeholder="🔍 Search plants..." id="plant-search" oninput="filterPlants()">
+    </div>
+    <div class="info-grid" id="info-grid">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- GROWTH TRACKER -->
+<div id="tracker" class="page">
+  <div class="tracker-container">
+    <div class="tracker-header">
+      <h2>Growth Tracker 📊</h2>
+      <p style="color:var(--muted);font-size:0.9rem;">Monitor your plant progress over time</p>
+    </div>
+    <div class="tracker-grid" id="tracker-grid">
+      <!-- Populated by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="login" class="page" style="padding-top:0;">
+  <div class="auth-card" style="margin:auto;">
+    <div class="auth-logo">🌱</div>
+    <h2 class="auth-title">Welcome back</h2>
+    <p class="auth-sub">Sign in to your PlantPal account</p>
+    <div class="auth-form">
+      <input type="email" placeholder="Email address">
+      <input type="password" placeholder="Password">
+      <button class="btn-auth" onclick="showPage('dashboard');showToast('✅ Welcome back, Gardener!')">Sign In</button>
+    </div>
+    <div class="divider"><span>or</span></div>
+    <div class="auth-switch">Don't have an account? <a onclick="showPage('register')">Sign up free</a></div>
+  </div>
+</div>
+
+<!-- REGISTER -->
+<div id="register" class="page" style="padding-top:0;">
+  <div class="auth-card" style="margin:auto;">
+    <div class="auth-logo">🌿</div>
+    <h2 class="auth-title">Create account</h2>
+    <p class="auth-sub">Start your gardening journey with PlantPal</p>
+    <div class="auth-form">
+      <input type="text" placeholder="Full name">
+      <input type="email" placeholder="Email address">
+      <input type="password" placeholder="Create password">
+      <button class="btn-auth" onclick="showPage('dashboard');showToast('🌱 Welcome to PlantPal!')">Create Account</button>
+    </div>
+    <div class="auth-switch">Already have an account? <a onclick="showPage('login')">Sign in</a></div>
+  </div>
+</div>
+
+<!-- LOG MODAL -->
+<div class="modal-overlay" id="log-modal">
+  <div class="modal">
+    <h3>📝 Log Growth Update</h3>
+    <p>Record today's measurements for <span id="modal-plant-name" style="color:var(--deep-green);font-weight:600;"></span></p>
+    <div class="form-group"><label>Height (cm)</label><input type="number" id="log-height" placeholder="e.g., 28"></div>
+    <div class="form-group"><label>Health Status</label>
+      <select id="log-health"><option>Excellent 🌟</option><option>Good 👍</option><option>Fair ⚠️</option><option>Needs attention 🚨</option></select>
+    </div>
+    <div class="form-group"><label>Notes</label><input type="text" id="log-notes" placeholder="Any observations..."></div>
+    <div class="modal-actions">
+      <button class="btn-outline" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveLog()">Save Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">🌱 <span id="toast-text"></span></div>
+
+<script>
+// ===== DATA =====
+let plants = [
+  { id:1, emoji:'🌿', name:'Pothos', type:'Tropical', water:'Every 3 days', sun:'Indirect light', health:'good', location:'Living room', added:'2025-01-10', height:32 },
+  { id:2, emoji:'🌵', name:'Cactus', type:'Cactus', water:'Every 2 weeks', sun:'Full sun', health:'excellent', location:'Kitchen windowsill', added:'2025-02-01', height:18 },
+  { id:3, emoji:'🌱', name:'Aloe Vera', type:'Succulent', water:'Every week', sun:'Indirect light', health:'excellent', location:'Bedroom', added:'2024-12-15', height:25 },
+  { id:4, emoji:'🍀', name:'Snake Plant', type:'Tropical', water:'Every 10 days', sun:'Low light', health:'good', location:'Study room', added:'2024-11-20', height:45 },
+  { id:5, emoji:'🌸', name:'Orchid', type:'Flowering', water:'Every week', sun:'Indirect light', health:'needs', location:'Bathroom', added:'2025-01-05', height:30 },
+  { id:6, emoji:'🌻', name:'Sunflower', type:'Flowering', water:'Every 2 days', sun:'Full sun (6+ hrs)', health:'good', location:'Balcony', added:'2025-03-01', height:60 },
+];
+
+const plantLibrary = [
+  { emoji:'🌱', name:'Aloe Vera', water:'Every 7 days', sun:'Bright indirect', diff:'Easy', desc:'A resilient succulent known for its soothing gel. Prefers well-draining soil and tolerates neglect well.' },
+  { emoji:'🍀', name:'Snake Plant', water:'Every 10 days', sun:'Low to bright', diff:'Easy', desc:'Nearly indestructible, this popular houseplant tolerates low light and infrequent watering perfectly.' },
+  { emoji:'🌿', name:'Pothos', water:'Every 3–5 days', sun:'Indirect', diff:'Easy', desc:'A fast-growing trailing vine ideal for beginners. Remove yellow leaves and avoid overwatering.' },
+  { emoji:'🌵', name:'Cactus', water:'Monthly', sun:'Full sun', diff:'Easy', desc:'Desert native that stores water in its thick stem. Allow soil to dry completely between waterings.' },
+  { emoji:'🌸', name:'Orchid', water:'Every 7–10 days', sun:'Indirect bright', diff:'Medium', desc:'Elegant flowering plant. Use bark medium, not soil. Repot after blooming season each year.' },
+  { emoji:'🌺', name:'Peace Lily', water:'Every 5 days', sun:'Low to medium', diff:'Easy', desc:'Beautiful air purifier that droops dramatically when thirsty—a clear watering signal!' },
+  { emoji:'🌻', name:'Sunflower', water:'Every 2 days', sun:'Full sun 6+ hrs', diff:'Easy', desc:'Bright and cheerful annual. Plant in large pots or garden beds with full direct sunlight.' },
+  { emoji:'🌹', name:'Rose', water:'Every 3 days', sun:'Full sun 6 hrs', diff:'Hard', desc:'Classic garden beauty. Requires regular pruning, feeding, and vigilance against pests.' },
+  { emoji:'🎋', name:'Bamboo', water:'Every 2–3 days', sun:'Indirect', diff:'Medium', desc:'Fast-growing grass often grown in water or soil. Trim yellow stalks and change water weekly.' },
+  { emoji:'🌿', name:'Monstera', water:'Every week', sun:'Indirect bright', diff:'Easy', desc:'Iconic tropical with split leaves. Wipe leaves monthly and provide a moss pole for support.' },
+  { emoji:'🍃', name:'Fern', water:'Every 2 days', sun:'Low to indirect', diff:'Medium', desc:'Loves humidity. Mist regularly or place on a pebble tray with water for consistent moisture.' },
+  { emoji:'🌱', name:'Mint', water:'Every 2 days', sun:'Partial sun', diff:'Easy', desc:'Vigorous herb best kept in pots to prevent spreading. Great for kitchen windowsills.' },
+];
+
+const logs = {
+  1: [{ date:'Mar 12', height:32, health:'Good', note:'Growing fast!' }],
+  2: [{ date:'Feb 28', height:18, health:'Excellent', note:'Very happy cactus' }],
+  3: [{ date:'Mar 10', height:25, health:'Excellent', note:'New shoot emerging' }],
+};
+
+let selectedEmoji = '🌱';
+let activeModalPlant = null;
+
+// ===== RENDER PLANTS =====
+function renderPlants() {
+  const grid = document.getElementById('plant-grid');
+  const healthLabel = { excellent:'Excellent', good:'Good', needs:'Needs Care' };
+  const healthClass = { excellent:'health-excellent', good:'health-good', needs:'health-needs' };
+  const bg = { excellent:'#e6f5e6', good:'#e0f0ff', needs:'#fde8e7' };
+  grid.innerHTML = plants.map(p => `
+    <div class="plant-card">
+      <div class="plant-card-top" style="background:${bg[p.health]}">
+        <span>${p.emoji}</span>
+        <span class="plant-health-badge ${healthClass[p.health]}">${healthLabel[p.health]}</span>
+      </div>
+      <div class="plant-card-body">
+        <h4>${p.name}</h4>
+        <p>${p.type} · ${p.location}</p>
+      </div>
+      <div class="plant-card-footer">
+        <span class="plant-water-info">💧 ${p.water}</span>
+        <span style="font-size:0.75rem;color:var(--muted);">${p.sun === 'Full sun (6+ hrs)' ? '☀' : '🌤'}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== RENDER PLANT LIBRARY =====
+function renderLibrary() {
+  const grid = document.getElementById('info-grid');
+  const diffClass = { Easy:'tag-diff', Medium:'tag-sun', Hard:'tag-hard' };
+  grid.innerHTML = plantLibrary.map(p => `
+    <div class="info-card">
+      <div class="info-card-top" style="background:var(--pale)">${p.emoji}</div>
+      <div class="info-card-body">
+        <h3>${p.name}</h3>
+        <div class="tag-row">
+          <span class="info-tag tag-water">💧 ${p.water}</span>
+          <span class="info-tag tag-sun">☀ ${p.sun}</span>
+          <span class="info-tag ${diffClass[p.diff]}">${p.diff}</span>
+        </div>
+        <p class="info-card-desc">${p.desc}</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== FILTER LIBRARY =====
+function filterPlants() {
+  const q = document.getElementById('plant-search').value.toLowerCase();
+  const grid = document.getElementById('info-grid');
+  const filtered = plantLibrary.filter(p => p.name.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q));
+  const diffClass = { Easy:'tag-diff', Medium:'tag-sun', Hard:'tag-hard' };
+  grid.innerHTML = filtered.map(p => `
+    <div class="info-card">
+      <div class="info-card-top" style="background:var(--pale)">${p.emoji}</div>
+      <div class="info-card-body">
+        <h3>${p.name}</h3>
+        <div class="tag-row">
+          <span class="info-tag tag-water">💧 ${p.water}</span>
+          <span class="info-tag tag-sun">☀ ${p.sun}</span>
+          <span class="info-tag ${diffClass[p.diff]}">${p.diff}</span>
+        </div>
+        <p class="info-card-desc">${p.desc}</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== RENDER TRACKER =====
+function renderTracker() {
+  const grid = document.getElementById('tracker-grid');
+  grid.innerHTML = plants.map(p => {
+    const plantLogs = logs[p.id] || [];
+    const lastLog = plantLogs[plantLogs.length - 1];
+    return `
+    <div class="tracker-card" onclick="openModal(${p.id})">
+      <div class="tracker-emoji">${p.emoji}</div>
+      <div class="tracker-info">
+        <h4>${p.name}</h4>
+        <p>${p.type} · Added ${p.added}</p>
+        <div class="tracker-meta">
+          <div class="tracker-stat">Height: <strong>${p.height} cm</strong></div>
+          <div class="tracker-stat">Last log: <strong>${lastLog ? lastLog.date : 'None'}</strong></div>
+        </div>
+        <div class="progress-bar" style="margin-top:8px;width:180px;">
+          <div class="progress-fill" style="width:${Math.min(p.height * 1.2, 100)}%"></div>
+        </div>
+      </div>
+      <button class="tracker-btn" onclick="event.stopPropagation();openModal(${p.id})">+ Log Update</button>
+    </div>
+    ${plantLogs.map(l => `
+      <div class="log-entry" style="margin-left:2rem;">
+        <div class="log-date">${l.date}</div>
+        <div class="log-content"><h5>${l.health} · ${l.height} cm</h5><p>${l.note}</p></div>
+      </div>
+    `).join('')}
+  `}).join('');
+}
+
+// ===== ADD PLANT =====
+function addPlant() {
+  const name = document.getElementById('plant-name').value.trim();
+  const type = document.getElementById('plant-type').value;
+  if (!name || !type) { showToast('❌ Please fill in plant name and type'); return; }
+  const newPlant = {
+    id: plants.length + 1,
+    emoji: selectedEmoji,
+    name, type,
+    water: document.getElementById('water-freq').value,
+    sun: document.getElementById('sunlight').value,
+    health: 'excellent',
+    location: document.getElementById('location').value || 'Unknown',
+    added: document.getElementById('date-added').value || new Date().toISOString().split('T')[0],
+    height: 5,
+  };
+  plants.push(newPlant);
+  renderPlants();
+  renderTracker();
+  showToast(`🌱 ${name} added to your garden!`);
+  showPage('dashboard');
+  document.getElementById('plant-name').value = '';
+  document.getElementById('plant-type').value = '';
+}
+
+// ===== EMOJI PICKER =====
+document.getElementById('emoji-picker').addEventListener('click', e => {
+  const opt = e.target.closest('.emoji-opt');
+  if (!opt) return;
+  document.querySelectorAll('.emoji-opt').forEach(o => o.classList.remove('selected'));
+  opt.classList.add('selected');
+  selectedEmoji = opt.dataset.emoji;
+});
+
+// ===== MODAL =====
+function openModal(plantId) {
+  activeModalPlant = plantId;
+  const plant = plants.find(p => p.id === plantId);
+  document.getElementById('modal-plant-name').textContent = plant.name;
+  document.getElementById('log-height').value = plant.height;
+  document.getElementById('log-modal').classList.add('open');
+}
+function closeModal() { document.getElementById('log-modal').classList.remove('open'); }
+function saveLog() {
+  const plant = plants.find(p => p.id === activeModalPlant);
+  const height = parseInt(document.getElementById('log-height').value) || plant.height;
+  const health = document.getElementById('log-health').value;
+  const note = document.getElementById('log-notes').value || 'No notes added';
+  plant.height = height;
+  if (!logs[activeModalPlant]) logs[activeModalPlant] = [];
+  logs[activeModalPlant].unshift({ date: 'Mar 13', height, health: health.split(' ')[0], note });
+  closeModal();
+  renderTracker();
+  renderPlants();
+  showToast(`📊 Growth log saved for ${plant.name}`);
+}
+document.getElementById('log-modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+// ===== TOAST =====
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-text').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3200);
+}
+
+// ===== PAGE ROUTING =====
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-links button').forEach(b => b.classList.remove('active'));
+  const nb = document.getElementById('nav-' + id);
+  if (nb) nb.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ===== DATE DEFAULT =====
+document.getElementById('date-added').value = new Date().toISOString().split('T')[0];
+
+// ===== INIT =====
+renderPlants();
+renderLibrary();
+renderTracker();
+</script>
+</body>
+</html>
